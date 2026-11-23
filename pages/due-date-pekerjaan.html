@@ -475,6 +475,7 @@
       modal.classList.toggle("flex", show);
     }
 
+    // <-- LETAKKAN / UBAH DI SINI (di bagian event listener)
     document.getElementById("dd-tbody")?.addEventListener("click", (e) => {
       const cell = e.target.closest(".dd-case-cell");
       if (!cell) return;
@@ -482,8 +483,8 @@
       const hint = cell.querySelector(".dd-case-hint");
       if (hint) {
         hint.textContent = cell.classList.contains("is-expanded")
-          ? "Klik untuk ringkas (maks. 4 baris)"
-          : "Klik untuk buka/tutup";
+          ? "Klik untuk ringkas (maks. 5 baris)"
+          : "Klik untuk buka penuh";
       }
     });
 
