@@ -1,5 +1,5 @@
 window.APP_CONFIG = {
-  gasUrl: "https://script.google.com/macros/s/AKfycbzBNrjG1n8Ysm-PFkN_R7vPpMJ4yXoJOSoMDSOBEzRZ6SILXhtT-zxl64qawdXxpkXI4g/exec",
+  gasUrl: "https://script.google.com/macros/s/AKfycbzNTYWA6W_6sJBXQbmsT63oidkuiyLi4NomRU9ckcD77AgNnAuGeOKZdDDY2bnTtwbwVw/exec",
   defaultMenu: "kpi_wisa",
   menus: {
     kpi_wisa: {
