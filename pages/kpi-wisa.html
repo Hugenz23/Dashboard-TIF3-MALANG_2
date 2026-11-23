@@ -1,44 +1,403 @@
-<div class="space-y-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between gap-4">
+<style>
+  .kw-card {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+  }
+  .kw-badge-pill {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  .kw-table-wrap {
+    overflow-x: auto;
+    max-height: 550px;
+  }
+  .kw-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  .kw-table th,
+  .kw-table td {
+    border-bottom: 1px solid #334155;
+    border-right: 1px solid rgba(51, 65, 85, 0.4);
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+  .kw-table th:last-child,
+  .kw-table td:last-child {
+    border-right: none;
+  }
+  .kw-table thead tr th {
+    background: #0f172a;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .kw-pic-badge {
+    background: #0f172a;
+    color: #94a3b8;
+    border: 1px solid #334155;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+  }
+  .kw-status-comply {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.72rem;
+    display: inline-block;
+  }
+  .kw-status-not-comply {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.72rem;
+    display: inline-block;
+  }
+  .kw-status-na {
+    color: #94a3b8;
+    font-weight: 600;
+  }
+  .kw-btn-rca {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+</style>
+
+<div class="space-y-5">
+  <!-- Top Header -->
+  <div class="kw-card p-5 flex flex-wrap items-center justify-between gap-4">
     <div>
-      <h1 class="text-lg font-bold">KPI WISA</h1>
-      <p class="text-xs text-slate-400">Halaman khusus: <code>pages/kpi-wisa.html</code></p>
+      <h1 class="text-xl font-bold text-white">WISA : KPI Nov 2026 &amp; RCA Management</h1>
+      <p class="text-xs text-slate-400 mt-1">Portal Monitoring Operasional Terpadu Telekomunikasi Indonesia Wilayah Malang</p>
     </div>
-    <button id="btn-refresh-kpi-wisa" type="button"
-      class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-medium transition">
-      <i class="fa-solid fa-rotate-right mr-1.5"></i>Refresh Data
-    </button>
+    <div class="flex items-center gap-3 flex-wrap">
+      <button id="kw-btn-refresh" type="button"
+        class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-rotate-right"></i> Refresh
+      </button>
+      <div class="kw-badge-pill">
+        <i class="fa-regular fa-calendar mr-1"></i> Periode: November 2026
+      </div>
+    </div>
   </div>
 
-  <div id="kpi-wisa-content" class="bg-slate-900 border border-slate-800 rounded-xl p-5 text-sm text-slate-300">
-    Menyiapkan data KPI WISA...
+  <!-- Summary Statistics Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div class="kw-card p-5 flex flex-col justify-between">
+      <div class="text-xs uppercase text-slate-400 font-bold tracking-wider">Total Indikator KPI</div>
+      <div class="flex justify-between items-end mt-2.5">
+        <div>
+          <div class="text-3xl font-extrabold text-white" id="kw-stat-total">0</div>
+          <div class="text-xs text-slate-400 mt-1">Item Evaluasi WISA</div>
+        </div>
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 text-slate-400">
+          <i class="fa-solid fa-layer-group fa-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="kw-card p-5 flex flex-col justify-between" style="border-left: 4px solid #10b981;">
+      <div class="text-xs uppercase text-slate-400 font-bold tracking-wider">Comply Nov-26</div>
+      <div class="flex justify-between items-end mt-2.5">
+        <div>
+          <div class="text-3xl font-extrabold text-emerald-400" id="kw-stat-comply">0</div>
+          <div class="text-xs text-slate-400 mt-1" id="kw-stat-comply-pct">(0%) Sesuai Target</div>
+        </div>
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 text-emerald-400">
+          <i class="fa-solid fa-circle-check fa-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="kw-card p-5 flex flex-col justify-between" style="border-left: 4px solid #ef4444;">
+      <div class="text-xs uppercase text-slate-400 font-bold tracking-wider">Not Comply Nov-26</div>
+      <div class="flex justify-between items-end mt-2.5">
+        <div>
+          <div class="text-3xl font-extrabold text-red-400" id="kw-stat-not-comply">0</div>
+          <div class="text-xs text-slate-400 mt-1">
+            Membutuhkan RCA <br>
+            <span class="text-red-400 text-[11px]"><i class="fa-solid fa-triangle-exclamation"></i> Perlu Tindakan Remedi</span>
+          </div>
+        </div>
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 text-red-400">
+          <i class="fa-solid fa-triangle-exclamation fa-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="kw-card p-5 flex flex-col justify-between">
+      <div class="text-xs uppercase text-slate-400 font-bold tracking-wider">N/A / Non Evaluasi</div>
+      <div class="flex justify-between items-end mt-2.5">
+        <div>
+          <div class="text-3xl font-extrabold text-slate-400" id="kw-stat-na">0</div>
+          <div class="text-xs text-slate-400 mt-1">Data Belum Tersedia / N/A</div>
+        </div>
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 text-slate-400">
+          <i class="fa-solid fa-circle-question fa-lg"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <div class="kw-card p-4 flex flex-wrap justify-between items-center gap-4">
+    <div class="relative flex-1 min-w-[240px]">
+      <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+      <input type="text" id="kw-search-input" placeholder="Cari nama KPI atau nama PIC..."
+        class="w-full bg-slate-900 border border-slate-700 text-white py-2 pl-10 pr-3.5 rounded-lg outline-none text-sm focus:border-blue-500">
+    </div>
+
+    <div class="flex gap-4 items-center flex-wrap">
+      <div class="flex items-center gap-2 text-sm text-slate-400">
+        <i class="fa-solid fa-filter"></i> PIC:
+        <select id="kw-filter-pic" class="bg-slate-900 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none text-sm cursor-pointer">
+          <option value="ALL">Semua PIC</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2 text-sm text-slate-400">
+        Status Nov-26:
+        <select id="kw-filter-status" class="bg-slate-900 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none text-sm cursor-pointer">
+          <option value="ALL">Semua Status</option>
+          <option value="COMPLY">COMPLY</option>
+          <option value="NOT COMPLY">NOT COMPLY</option>
+          <option value="N/A">N/A</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table Card -->
+  <div class="kw-card overflow-hidden">
+    <div class="kw-table-wrap">
+      <table class="kw-table">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width: 50px;">No</th>
+            <th rowspan="2" class="text-left" style="min-width: 320px;">Indikator KPI</th>
+            <th rowspan="2" style="width: 130px;">PIC</th>
+            <th colspan="4" style="background: rgba(59, 130, 246, 0.1); color: #60a5fa;">OCT-26</th>
+            <th colspan="4" style="background: rgba(16, 185, 129, 0.1); color: #34d399;">NOV-26</th>
+            <th rowspan="2" style="width: 110px;">Aksi RCA</th>
+          </tr>
+          <tr>
+            <th style="background: #0b1120;">Target</th>
+            <th style="background: #0b1120;">Real</th>
+            <th style="background: #0b1120;">ACH</th>
+            <th style="background: #0b1120;">Compliance</th>
+            <th style="background: #0b1120;">Target</th>
+            <th style="background: #0b1120;">Real</th>
+            <th style="background: #0b1120;">ACH</th>
+            <th style="background: #0b1120;">Compliance</th>
+          </tr>
+        </thead>
+        <tbody id="kw-table-body">
+          <tr>
+            <td colspan="11" style="text-align: center; padding: 30px; color: #94a3b8;">Memuat data KPI WISA...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <script>
   window.initKpiWisa = async function () {
-    const box = document.getElementById("kpi-wisa-content");
-    const btn = document.getElementById("btn-refresh-kpi-wisa");
+    const fallbackUrl = "https://script.google.com/macros/s/AKfycbwcDbmnd95d8ych4XJWFw15mLcrur6RWtThpDR4p0ACvIg9HnwYYC0zILryt2x-xjnwUQ/exec";
+    const configuredUrl = window.APP_CONFIG && window.APP_CONFIG.gasUrl;
+    const baseUrl = (configuredUrl && !configuredUrl.includes("GANTI_DENGAN_URL")) ? configuredUrl : fallbackUrl;
 
-    async function loadData() {
-      const url = window.APP_CONFIG?.gasUrl;
-      if (!url || url.includes("GANTI_DENGAN_URL")) {
-        box.innerHTML =
-          '<div class="text-amber-300">Halaman <strong>KPI WISA</strong> aktif. Isi <code>gasUrl</code> di <code>assets/js/config.js</code> saat siap menghubungkan ke Google Apps Script.</div>';
+    let globalData = [];
+
+    function getStatusBadge(val) {
+      if (!val || val === "N/A" || val === "-") return `<span class="kw-status-na">N/A</span>`;
+      const str = String(val).toUpperCase();
+      if (str.includes("NOT")) return `<span class="kw-status-not-comply"><i class="fa-solid fa-triangle-exclamation"></i> NOT COMPLY</span>`;
+      if (str.includes("COMPLY")) return `<span class="kw-status-comply">COMPLY</span>`;
+      return `<span class="kw-status-na">${val}</span>`;
+    }
+
+    function populatePicDropdown(data) {
+      const picSet = new Set();
+      data.forEach(item => {
+        if (item.pic && item.pic !== "-") picSet.add(item.pic);
+      });
+      const select = document.getElementById("kw-filter-pic");
+      if (!select) return;
+      select.innerHTML = `<option value="ALL">Semua PIC</option>`;
+      picSet.forEach(pic => {
+        const opt = document.createElement("option");
+        opt.value = pic;
+        opt.textContent = pic;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById("kw-table-body");
+      if (!tbody) return;
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 25px; color: #94a3b8;">Tidak ada data KPI yang cocok dengan filter.</td></tr>`;
         return;
       }
 
-      box.innerHTML = '<div class="text-slate-400">Mengambil data KPI WISA...</div>';
+      tbody.innerHTML = data.map((item, idx) => {
+        const no = item.no || (idx + 1);
+        const kpi = item.kpi || "-";
+        const pic = item.pic || "ENTERPRISE";
+
+        const tOct = item.targetOct || "-";
+        const rOct = item.reaOct || "-";
+        const aOct = item.achOct || "-";
+        const cOct = item.compOct || "-";
+
+        const tNov = item.targetNov || "-";
+        const rNov = item.reaNov || "-";
+        const aNov = item.achNov || "-";
+        const cNov = item.compNov || "-";
+
+        const isNotComply = String(cNov).toUpperCase().includes("NOT");
+        const rcaButton = isNotComply
+          ? `<button type="button" class="kw-btn-rca"><i class="fa-solid fa-file-lines"></i> Detail RCA</button>`
+          : `<span style="color: #94a3b8;">-</span>`;
+
+        return `
+          <tr>
+            <td>${no}</td>
+            <td class="text-left" style="font-weight: 500; color: #fff;">${kpi}</td>
+            <td><span class="kw-pic-badge">${pic}</span></td>
+            <td>${tOct}</td>
+            <td>${rOct}</td>
+            <td>${aOct}</td>
+            <td>${getStatusBadge(cOct)}</td>
+            <td>${tNov}</td>
+            <td>${rNov}</td>
+            <td>${aNov}</td>
+            <td>${getStatusBadge(cNov)}</td>
+            <td>${rcaButton}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderDashboard(data) {
+      const total = data.length;
+      let complyCount = 0;
+      let notComplyCount = 0;
+      let naCount = 0;
+
+      data.forEach(item => {
+        const compNov = String(item.compNov || "").toUpperCase();
+        if (compNov.includes("NOT")) notComplyCount++;
+        else if (compNov.includes("COMPLY")) complyCount++;
+        else naCount++;
+      });
+
+      const elTotal = document.getElementById("kw-stat-total");
+      const elComply = document.getElementById("kw-stat-comply");
+      const elComplyPct = document.getElementById("kw-stat-comply-pct");
+      const elNotComply = document.getElementById("kw-stat-not-comply");
+      const elNa = document.getElementById("kw-stat-na");
+
+      if (elTotal) elTotal.innerText = total;
+      if (elComply) elComply.innerText = complyCount;
+      if (elComplyPct) {
+        const complyPct = total > 0 ? ((complyCount / total) * 100).toFixed(1) : 0;
+        elComplyPct.innerText = `(${complyPct}%) Sesuai Target`;
+      }
+      if (elNotComply) elNotComply.innerText = notComplyCount;
+      if (elNa) elNa.innerText = naCount;
+
+      renderTable(data);
+    }
+
+    function filterTable() {
+      const query = (document.getElementById("kw-search-input")?.value || "").toLowerCase();
+      const selectedPic = document.getElementById("kw-filter-pic")?.value || "ALL";
+      const selectedStatus = document.getElementById("kw-filter-status")?.value || "ALL";
+
+      const filtered = globalData.filter(item => {
+        const name = (item.kpi || "").toLowerCase();
+        const pic = (item.pic || "").toLowerCase();
+        const status = String(item.compNov || "").toUpperCase();
+
+        const matchQuery = name.includes(query) || pic.includes(query);
+        const matchPic = (selectedPic === "ALL") || (item.pic === selectedPic);
+
+        let matchStatus = true;
+        if (selectedStatus === "COMPLY") matchStatus = status.includes("COMPLY") && !status.includes("NOT");
+        else if (selectedStatus === "NOT COMPLY") matchStatus = status.includes("NOT");
+        else if (selectedStatus === "N/A") matchStatus = !status.includes("COMPLY") && !status.includes("NOT");
+
+        return matchQuery && matchPic && matchStatus;
+      });
+
+      renderTable(filtered);
+    }
+
+    async function fetchKpiData() {
+      const tbody = document.getElementById("kw-table-body");
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 30px; color: #94a3b8;">Memuat data dari Google Apps Script...</td></tr>`;
+      }
+
       try {
-        const res = await fetch(`${url}?menu=kpi_wisa`);
-        const data = await res.json();
-        box.innerHTML = `<pre class="text-xs overflow-auto">${JSON.stringify(data, null, 2)}</pre>`;
+        const sep = baseUrl.includes("?") ? "&" : "?";
+        const res = await fetch(`${baseUrl}${sep}menu=kpi_wisa`);
+        const raw = await res.json();
+
+        // Mendukung respons array langsung maupun object { rows: [...] } / { data: [...] }
+        const list = Array.isArray(raw)
+          ? raw
+          : (Array.isArray(raw?.rows) ? raw.rows : (Array.isArray(raw?.data) ? raw.data : []));
+
+        globalData = list;
+        populatePicDropdown(globalData);
+        renderDashboard(globalData);
       } catch (err) {
-        box.innerHTML = `<div class="text-red-400">Gagal memuat data: ${err.message}</div>`;
+        console.error(err);
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="11" style="color:#ef4444; text-align:center; padding: 20px;">Gagal memuat data. Pastikan Apps Script sudah di-deploy dengan versi terbaru ("New version") dan akses Web App terbuka.</td></tr>`;
+        }
       }
     }
 
-    if (btn) btn.addEventListener("click", loadData);
-    await loadData();
+    document.getElementById("kw-search-input")?.addEventListener("input", filterTable);
+    document.getElementById("kw-filter-pic")?.addEventListener("change", filterTable);
+    document.getElementById("kw-filter-status")?.addEventListener("change", filterTable);
+    document.getElementById("kw-btn-refresh")?.addEventListener("click", fetchKpiData);
+
+    await fetchKpiData();
   };
 </script>
