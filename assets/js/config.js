@@ -1,5 +1,5 @@
 window.APP_CONFIG = {
-  gasUrl: "https://script.google.com/macros/s/GANTI_DENGAN_URL_WEB_APP_GAS/exec",
+  gasUrl: "https://script.google.com/macros/s/AKfycbzNTYWA6W_6sJBXQbmsT63oidkuiyLi4NomRU9ckcD77AgNnAuGeOKZdDDY2bnTtwbwVw/exec",
   defaultMenu: "kpi_wisa",
   menus: {
     kpi_wisa: {
