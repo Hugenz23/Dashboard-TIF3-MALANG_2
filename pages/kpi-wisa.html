@@ -223,7 +223,7 @@
         </thead>
         <tbody id="kw-table-body">
           <tr>
-            <td colspan="11" style="text-align: center; padding: 30px; color: #94a3b8;">Memuat data KPI WISA...</td>
+            <td colspan="12" style="text-align: center; padding: 30px; color: #94a3b8;">Memuat data KPI WISA...</td>
           </tr>
         </tbody>
       </table>
@@ -268,7 +268,7 @@
       if (!tbody) return;
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 25px; color: #94a3b8;">Tidak ada data KPI yang cocok dengan filter.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding: 25px; color: #94a3b8;">Tidak ada data KPI yang cocok dengan filter.</td></tr>`;
         return;
       }
 
@@ -369,7 +369,7 @@
     async function fetchKpiData() {
       const tbody = document.getElementById("kw-table-body");
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 30px; color: #94a3b8;">Memuat data dari Google Apps Script...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 30px; color: #94a3b8;">Memuat data dari Google Apps Script...</td></tr>`;
       }
 
       try {
@@ -377,7 +377,6 @@
         const res = await fetch(`${baseUrl}${sep}menu=kpi_wisa`);
         const raw = await res.json();
 
-        // Mendukung respons array langsung maupun object { rows: [...] } / { data: [...] }
         const list = Array.isArray(raw)
           ? raw
           : (Array.isArray(raw?.rows) ? raw.rows : (Array.isArray(raw?.data) ? raw.data : []));
@@ -388,7 +387,7 @@
       } catch (err) {
         console.error(err);
         if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="11" style="color:#ef4444; text-align:center; padding: 20px;">Gagal memuat data. Pastikan Apps Script sudah di-deploy dengan versi terbaru ("New version") dan akses Web App terbuka.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="12" style="color:#ef4444; text-align:center; padding: 20px;">Gagal memuat data. Pastikan Apps Script sudah di-deploy dengan versi terbaru ("New version") dan akses Web App terbuka.</td></tr>`;
         }
       }
     }
