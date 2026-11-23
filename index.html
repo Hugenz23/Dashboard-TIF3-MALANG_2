@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Operasional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex">
+
+  <!-- SIDEBAR (3 MENU) -->
+  <aside class="w-64 shrink-0 bg-slate-900 border-r border-slate-800 p-4 flex flex-col">
+    <div class="px-2 pb-4 mb-4 border-b border-slate-800">
+      <div class="text-xs uppercase tracking-wider text-blue-400 font-semibold">Operasional</div>
+      <div class="text-lg font-bold">Menu Terpisah</div>
+    </div>
+
+    <nav class="space-y-1 flex-1">
+      <button type="button" data-menu="kpi_wisa"
+        class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left text-slate-300 hover:bg-slate-800 transition">
+        <i class="fa-solid fa-chart-line w-4 text-center"></i>
+        <span>KPI WISA</span>
+      </button>
+
+      <button type="button" data-menu="monitoring_deployment"
+        class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left text-slate-300 hover:bg-slate-800 transition">
+        <i class="fa-solid fa-tower-broadcast w-4 text-center"></i>
+        <span>Monitoring Deployment</span>
+      </button>
+
+      <button type="button" data-menu="due_date_pekerjaan"
+        class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left text-slate-300 hover:bg-slate-800 transition">
+        <i class="fa-solid fa-calendar-check w-4 text-center"></i>
+        <span>Due Date Pekerjaan</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- AREA KONTEN DINAMIS -->
+  <main class="flex-1 p-6 min-w-0">
+    <div id="app-content" class="space-y-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 text-slate-400">
+        Memuat halaman...
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/router.js"></script>
+</body>
+</html>
