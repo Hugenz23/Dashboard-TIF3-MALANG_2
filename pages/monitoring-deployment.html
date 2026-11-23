@@ -1,7 +1,13 @@
 <div class="space-y-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
-    <h1 class="text-lg font-bold">Monitoring Deployment</h1>
-    <p class="text-xs text-slate-400">File terpisah: <code>pages/monitoring-deployment.html</code></p>
+  <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between gap-4">
+    <div>
+      <h1 class="text-lg font-bold">Monitoring Deployment</h1>
+      <p class="text-xs text-slate-400">Halaman khusus: <code>pages/monitoring-deployment.html</code></p>
+    </div>
+    <button id="btn-refresh-deployment" type="button"
+      class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-medium transition">
+      <i class="fa-solid fa-rotate-right mr-1.5"></i>Refresh Data
+    </button>
   </div>
 
   <div id="monitoring-deployment-content" class="bg-slate-900 border border-slate-800 rounded-xl p-5 text-sm text-slate-300">
@@ -12,6 +18,27 @@
 <script>
   window.initMonitoringDeployment = async function () {
     const box = document.getElementById("monitoring-deployment-content");
-    box.innerHTML = "Area khusus <strong>Monitoring Deployment</strong> — edit tampilan/logika di file <code>pages/monitoring-deployment.html</code>.";
+    const btn = document.getElementById("btn-refresh-deployment");
+
+    async function loadData() {
+      const url = window.APP_CONFIG?.gasUrl;
+      if (!url || url.includes("GANTI_DENGAN_URL")) {
+        box.innerHTML =
+          '<div class="text-amber-300">Halaman <strong>Monitoring Deployment</strong> aktif. Edit tampilan &amp; logika khusus di <code>pages/monitoring-deployment.html</code>.</div>';
+        return;
+      }
+
+      box.innerHTML = '<div class="text-slate-400">Mengambil data Monitoring Deployment...</div>';
+      try {
+        const res = await fetch(`${url}?menu=monitoring_deployment`);
+        const data = await res.json();
+        box.innerHTML = `<pre class="text-xs overflow-auto">${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (err) {
+        box.innerHTML = `<div class="text-red-400">Gagal memuat data: ${err.message}</div>`;
+      }
+    }
+
+    if (btn) btn.addEventListener("click", loadData);
+    await loadData();
   };
 </script>
