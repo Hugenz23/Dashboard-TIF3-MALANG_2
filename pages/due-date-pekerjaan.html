@@ -42,19 +42,25 @@
     vertical-align: middle !important;
   }
   .dd-case-cell {
-    min-width: 280px;
-    max-width: 340px;
+    min-width: 210px;
+    max-width: 250px;
+    width: 230px;
     cursor: pointer;
   }
   .dd-case-text {
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;
     white-space: normal;
     line-height: 1.35;
     color: #fff;
     font-weight: 600;
+    word-break: break-word;
+  }
+  .dd-case-cell.is-expanded {
+    max-width: 380px;
+    width: auto;
   }
   .dd-case-cell.is-expanded .dd-case-text {
     display: block;
@@ -209,7 +215,7 @@
         <thead>
           <tr>
             <th rowspan="2" style="width: 45px;">No</th>
-            <th rowspan="2" style="min-width: 280px; text-align: left;">Agenda / Case</th>
+            <th rowspan="2" style="min-width: 210px; max-width: 250px; width: 230px; text-align: left;">Agenda / Case</th>
             <th rowspan="2" style="min-width: 120px;">Type</th>
             <th rowspan="2" style="min-width: 110px;">PIC</th>
             <th rowspan="2" style="min-width: 95px;">Status</th>
