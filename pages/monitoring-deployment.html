@@ -1,0 +1,17 @@
+<div class="space-y-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+    <h1 class="text-lg font-bold">Monitoring Deployment</h1>
+    <p class="text-xs text-slate-400">File terpisah: <code>pages/monitoring-deployment.html</code></p>
+  </div>
+
+  <div id="monitoring-deployment-content" class="bg-slate-900 border border-slate-800 rounded-xl p-5 text-sm text-slate-300">
+    Menyiapkan data Monitoring Deployment...
+  </div>
+</div>
+
+<script>
+  window.initMonitoringDeployment = async function () {
+    const box = document.getElementById("monitoring-deployment-content");
+    box.innerHTML = "Area khusus <strong>Monitoring Deployment</strong> — edit tampilan/logika di file <code>pages/monitoring-deployment.html</code>.";
+  };
+</script>
