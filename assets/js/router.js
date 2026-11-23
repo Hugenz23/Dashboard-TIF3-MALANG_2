@@ -10,10 +10,27 @@
     });
   }
 
+  function executeInlineScripts(targetEl) {
+    const scripts = Array.from(targetEl.querySelectorAll("script"));
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement("script");
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      newScript.textContent = oldScript.textContent;
+      oldScript.parentNode.replaceChild(newScript, oldScript);
+    });
+  }
+
   async function loadMenu(menuKey, pushHash = true) {
-    const menus = window.APP_CONFIG.menus;
-    const key = menus[menuKey] ? menuKey : window.APP_CONFIG.defaultMenu;
+    const menus = window.APP_CONFIG?.menus || {};
+    const key = menus[menuKey] ? menuKey : window.APP_CONFIG?.defaultMenu;
     const cfg = menus[key];
+
+    if (!cfg) {
+      container.innerHTML = `<div class="bg-slate-900 border border-red-800 rounded-xl p-5 text-red-400">Konfigurasi menu tidak ditemukan.</div>`;
+      return;
+    }
 
     setActiveNav(key);
     if (pushHash) window.location.hash = "#" + key;
@@ -23,7 +40,9 @@
     try {
       const res = await fetch(`${cfg.file}?v=${Date.now()}`);
       if (!res.ok) throw new Error(`Gagal memuat ${cfg.file} (${res.status})`);
+
       container.innerHTML = await res.text();
+      executeInlineScripts(container);
 
       if (typeof window[cfg.initFn] === "function") {
         await window[cfg.initFn]();
@@ -45,7 +64,7 @@
   });
 
   window.addEventListener("DOMContentLoaded", () => {
-    const startKey = window.location.hash.replace(/^#/, "") || window.APP_CONFIG.defaultMenu;
+    const startKey = window.location.hash.replace(/^#/, "") || window.APP_CONFIG?.defaultMenu;
     loadMenu(startKey, false);
   });
 })();
