@@ -1,44 +1,477 @@
-<div class="space-y-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between gap-4">
+<style>
+  .dd-card {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+  }
+  .dd-table-wrap {
+    overflow-x: auto;
+    max-height: 540px;
+  }
+  .dd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+  .dd-table th,
+  .dd-table td {
+    border-bottom: 1px solid #334155;
+    border-right: 1px solid rgba(51, 65, 85, 0.45);
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+  .dd-table th:last-child,
+  .dd-table td:last-child {
+    border-right: none;
+  }
+  .dd-table thead th {
+    background: #0f172a;
+    color: #94a3b8;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    text-align: center;
+  }
+  .dd-day-cell {
+    min-width: 34px;
+    text-align: center;
+    font-weight: 700;
+  }
+  .dd-today-col {
+    outline: 2px solid #3b82f6;
+    outline-offset: -2px;
+  }
+  .dd-badge-done {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+  }
+  .dd-badge-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+  }
+  .dd-badge-due {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+  }
+</style>
+
+<div class="space-y-5">
+  <!-- Header -->
+  <div class="dd-card p-5 flex flex-wrap items-center justify-between gap-4">
     <div>
-      <h1 class="text-lg font-bold">Due Date Pekerjaan</h1>
-      <p class="text-xs text-slate-400">Halaman khusus: <code>pages/due-date-pekerjaan.html</code></p>
+      <h1 class="text-xl font-bold text-white">Due Date Pekerjaan &amp; Agenda Harian</h1>
+      <p class="text-xs text-slate-400 mt-1" id="dd-date-subtitle">Memuat informasi tanggal...</p>
     </div>
-    <button id="btn-refresh-due-date" type="button"
-      class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-medium transition">
-      <i class="fa-solid fa-rotate-right mr-1.5"></i>Refresh Data
-    </button>
+    <div class="flex items-center gap-2.5 flex-wrap">
+      <button id="dd-btn-open-modal" type="button"
+        class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-plus"></i> Tambah Agenda
+      </button>
+      <button id="dd-btn-refresh" type="button"
+        class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-rotate-right"></i> Refresh
+      </button>
+    </div>
   </div>
 
-  <div id="due-date-pekerjaan-content" class="bg-slate-900 border border-slate-800 rounded-xl p-5 text-sm text-slate-300">
-    Menyiapkan data Due Date Pekerjaan...
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div class="dd-card p-5 flex items-center justify-between">
+      <div>
+        <div class="text-xs uppercase text-slate-400 font-bold tracking-wider">Total Agenda</div>
+        <div class="text-3xl font-extrabold text-white mt-2" id="dd-stat-total">0</div>
+        <div class="text-xs text-slate-400 mt-1">Pekerjaan Terdaftar</div>
+      </div>
+      <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-400">
+        <i class="fa-solid fa-list-check fa-lg"></i>
+      </div>
+    </div>
+
+    <div class="dd-card p-5 flex items-center justify-between" style="border-left: 4px solid #10b981;">
+      <div>
+        <div class="text-xs uppercase text-slate-400 font-bold tracking-wider">Selesai / Done</div>
+        <div class="text-3xl font-extrabold text-emerald-400 mt-2" id="dd-stat-done">0</div>
+        <div class="text-xs text-slate-400 mt-1">Agenda Tuntas</div>
+      </div>
+      <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-400">
+        <i class="fa-solid fa-circle-check fa-lg"></i>
+      </div>
+    </div>
+
+    <div class="dd-card p-5 flex items-center justify-between" style="border-left: 4px solid #f59e0b;">
+      <div>
+        <div class="text-xs uppercase text-slate-400 font-bold tracking-wider">Pending / Berjalan</div>
+        <div class="text-3xl font-extrabold text-amber-400 mt-2" id="dd-stat-pending">0</div>
+        <div class="text-xs text-slate-400 mt-1">Menunggu Penyelesaian</div>
+      </div>
+      <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-amber-500/10 text-amber-400">
+        <i class="fa-solid fa-clock fa-lg"></i>
+      </div>
+    </div>
+
+    <div class="dd-card p-5 flex items-center justify-between" style="border-left: 4px solid #ef4444;">
+      <div>
+        <div class="text-xs uppercase text-slate-400 font-bold tracking-wider">Due Hari Ini</div>
+        <div class="text-3xl font-extrabold text-red-400 mt-2" id="dd-stat-today">0</div>
+        <div class="text-xs text-slate-400 mt-1">Jadwal Tanggal Aktif</div>
+      </div>
+      <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400">
+        <i class="fa-solid fa-calendar-day fa-lg"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="dd-card p-4 flex flex-wrap justify-between items-center gap-4">
+    <div class="relative flex-1 min-w-[240px]">
+      <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+      <input type="text" id="dd-search" placeholder="Cari agenda, PIC, atau keterangan..."
+        class="w-full bg-slate-900 border border-slate-700 text-white py-2 pl-10 pr-3.5 rounded-lg outline-none text-sm focus:border-blue-500">
+    </div>
+
+    <div class="flex gap-3 items-center flex-wrap">
+      <select id="dd-filter-type" class="bg-slate-900 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none text-sm cursor-pointer">
+        <option value="ALL">Semua Type</option>
+      </select>
+
+      <select id="dd-filter-status" class="bg-slate-900 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none text-sm cursor-pointer">
+        <option value="ALL">Semua Status</option>
+        <option value="DUE_TODAY">Due Hari Ini</option>
+        <option value="PENDING">Pending</option>
+        <option value="DONE">Done</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Matrix Table -->
+  <div class="dd-card overflow-hidden">
+    <div class="dd-table-wrap">
+      <table class="dd-table">
+        <thead>
+          <tr>
+            <th style="width: 45px;">No</th>
+            <th style="min-width: 260px; text-align: left;">Agenda / Pekerjaan</th>
+            <th style="min-width: 120px;">Type</th>
+            <th style="min-width: 110px;">PIC</th>
+            <th style="min-width: 95px;">Status</th>
+            <!-- Hari 1..30 -->
+            <th class="dd-day-cell">1</th><th class="dd-day-cell">2</th><th class="dd-day-cell">3</th><th class="dd-day-cell">4</th><th class="dd-day-cell">5</th>
+            <th class="dd-day-cell">6</th><th class="dd-day-cell">7</th><th class="dd-day-cell">8</th><th class="dd-day-cell">9</th><th class="dd-day-cell">10</th>
+            <th class="dd-day-cell">11</th><th class="dd-day-cell">12</th><th class="dd-day-cell">13</th><th class="dd-day-cell">14</th><th class="dd-day-cell">15</th>
+            <th class="dd-day-cell">16</th><th class="dd-day-cell">17</th><th class="dd-day-cell">18</th><th class="dd-day-cell">19</th><th class="dd-day-cell">20</th>
+            <th class="dd-day-cell">21</th><th class="dd-day-cell">22</th><th class="dd-day-cell">23</th><th class="dd-day-cell">24</th><th class="dd-day-cell">25</th>
+            <th class="dd-day-cell">26</th><th class="dd-day-cell">27</th><th class="dd-day-cell">28</th><th class="dd-day-cell">29</th><th class="dd-day-cell">30</th>
+            <th style="min-width: 160px; text-align: left;">Keterangan / Hasil</th>
+          </tr>
+        </thead>
+        <tbody id="dd-tbody">
+          <tr>
+            <td colspan="36" style="text-align: center; padding: 28px; color: #94a3b8;">Memuat data Due Date Pekerjaan...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tambah Agenda -->
+<div id="dd-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
+  <div class="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-lg p-5 space-y-4">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <h2 class="text-base font-bold text-white">Tambah Agenda Baru</h2>
+      <button id="dd-btn-close-modal" type="button" class="text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form id="dd-form" class="space-y-3 text-sm">
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Nama Agenda / Pekerjaan *</label>
+        <input type="text" name="agenda" required placeholder="Contoh: Validasi data wilayah Malang"
+          class="w-full bg-slate-950 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none focus:border-blue-500">
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Type</label>
+          <input type="text" name="type" placeholder="VALDAT DISTRIBUSI"
+            class="w-full bg-slate-950 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Target Tanggal (1-30)</label>
+          <input type="number" name="targetDay" min="1" max="30" placeholder="Misal: 25"
+            class="w-full bg-slate-950 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none focus:border-blue-500">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">PIC</label>
+        <input type="text" name="pic" placeholder="Nama PIC"
+          class="w-full bg-slate-950 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none focus:border-blue-500">
+      </div>
+
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Keterangan</label>
+        <textarea name="ket" rows="2" placeholder="Catatan tambahan..."
+          class="w-full bg-slate-950 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none focus:border-blue-500"></textarea>
+      </div>
+
+      <div id="dd-form-msg" class="text-xs hidden"></div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="dd-btn-cancel" type="button"
+          class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
+          Batal
+        </button>
+        <button id="dd-btn-submit" type="submit"
+          class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold">
+          Simpan Agenda
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 
 <script>
   window.initDueDatePekerjaan = async function () {
-    const box = document.getElementById("due-date-pekerjaan-content");
-    const btn = document.getElementById("btn-refresh-due-date");
-
-    async function loadData() {
-      const url = window.APP_CONFIG?.gasUrl;
-      if (!url || url.includes("GANTI_DENGAN_URL")) {
-        box.innerHTML =
-          '<div class="text-amber-300">Halaman <strong>Due Date Pekerjaan</strong> aktif. Edit tampilan &amp; logika khusus di <code>pages/due-date-pekerjaan.html</code>.</div>';
-        return;
+    const gasUrl = window.APP_CONFIG && window.APP_CONFIG.gasUrl;
+    if (!gasUrl || gasUrl.includes("GANTI_DENGAN_URL")) {
+      const tbody = document.getElementById("dd-tbody");
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="36" style="text-align:center; padding:24px; color:#f87171;">URL Google Apps Script belum diatur di assets/js/config.js.</td></tr>`;
       }
+      return;
+    }
 
-      box.innerHTML = '<div class="text-slate-400">Mengambil data Due Date Pekerjaan...</div>';
-      try {
-        const res = await fetch(`${url}?menu=due_date_pekerjaan`);
-        const data = await res.json();
-        box.innerHTML = `<pre class="text-xs overflow-auto">${JSON.stringify(data, null, 2)}</pre>`;
-      } catch (err) {
-        box.innerHTML = `<div class="text-red-400">Gagal memuat data: ${err.message}</div>`;
+    let allItems = [];
+
+    async function postToGas(payload) {
+      const res = await fetch(gasUrl, {
+        method: "POST",
+        redirect: "follow",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      return res.json();
+    }
+
+    function populateTypeFilter(types) {
+      const select = document.getElementById("dd-filter-type");
+      if (!select) return;
+      const currentVal = select.value || "ALL";
+      select.innerHTML = `<option value="ALL">Semua Type</option>`;
+      (types || []).forEach((t) => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        select.appendChild(opt);
+      });
+      if (Array.from(select.options).some((o) => o.value === currentVal)) {
+        select.value = currentVal;
       }
     }
 
-    if (btn) btn.addEventListener("click", loadData);
-    await loadData();
+    function renderSummary(data) {
+      const summary = data.summary || {};
+      const items = data.items || [];
+      const dueTodayCount = items.filter((it) => Boolean(it.isDueToday)).length;
+
+      const elTotal = document.getElementById("dd-stat-total");
+      const elDone = document.getElementById("dd-stat-done");
+      const elPending = document.getElementById("dd-stat-pending");
+      const elToday = document.getElementById("dd-stat-today");
+      const elSub = document.getElementById("dd-date-subtitle");
+
+      if (elTotal) elTotal.textContent = summary.total ?? items.length;
+      if (elDone) elDone.textContent = summary.done ?? 0;
+      if (elPending) elPending.textContent = summary.pending ?? 0;
+      if (elToday) elToday.textContent = dueTodayCount;
+
+      if (elSub) {
+        const tInfo = data.todayInfo;
+        elSub.textContent = tInfo && tInfo.formattedDate
+          ? `Monitoring jadwal harian & due date • Hari ini: ${tInfo.formattedDate} (Tanggal ${tInfo.day})`
+          : "Monitoring jadwal harian & due date pekerjaan";
+      }
+    }
+
+    function renderRows(items) {
+      const tbody = document.getElementById("dd-tbody");
+      if (!tbody) return;
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="36" style="text-align:center; padding:24px; color:#94a3b8;">Tidak ada agenda yang sesuai dengan filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map((item) => {
+        let statusBadge = `<span class="dd-badge-pending">Pending</span>`;
+        if (item.isDone) {
+          statusBadge = `<span class="dd-badge-done">Done</span>`;
+        } else if (item.isDueToday) {
+          statusBadge = `<span class="dd-badge-due">Due Hari Ini</span>`;
+        }
+
+        const daysArr = Array.isArray(item.days) ? item.days : [];
+        const dayCells = Array.from({ length: 30 }, (_, idx) => {
+          const dObj = daysArr[idx] || { val: "", bg: "", isToday: false };
+          const styles = [];
+          if (dObj.bg) {
+            styles.push(`background-color: ${dObj.bg}; color: #0f172a;`);
+          }
+          const todayClass = dObj.isToday ? " dd-today-col" : "";
+          const styleAttr = styles.length ? ` style="${styles.join(" ")}"` : "";
+          return `<td class="dd-day-cell${todayClass}"${styleAttr}>${dObj.val || ""}</td>`;
+        }).join("");
+
+        const noteText = [item.ket, item.hasil].filter(Boolean).join(" • ") || "-";
+
+        return `
+          <tr>
+            <td style="text-align:center;">${item.no || "-"}</td>
+            <td style="font-weight:600; color:#fff;">${item.agenda || "-"}</td>
+            <td style="text-align:center;"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-xs">${item.type || "-"}</span></td>
+            <td style="text-align:center;">${item.pic || "-"}</td>
+            <td style="text-align:center;">${statusBadge}</td>
+            ${dayCells}
+            <td style="color:#cbd5e1;">${noteText}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function applyFilters() {
+      const q = (document.getElementById("dd-search")?.value || "").toLowerCase().trim();
+      const typeVal = document.getElementById("dd-filter-type")?.value || "ALL";
+      const statusVal = document.getElementById("dd-filter-status")?.value || "ALL";
+
+      const filtered = allItems.filter((item) => {
+        const hay = `${item.agenda || ""} ${item.pic || ""} ${item.ket || ""} ${item.hasil || ""}`.toLowerCase();
+        const matchQ = !q || hay.includes(q);
+        const matchType = typeVal === "ALL" || item.type === typeVal;
+
+        let matchStatus = true;
+        if (statusVal === "DONE") matchStatus = Boolean(item.isDone);
+        else if (statusVal === "PENDING") matchStatus = !item.isDone;
+        else if (statusVal === "DUE_TODAY") matchStatus = Boolean(item.isDueToday);
+
+        return matchQ && matchType && matchStatus;
+      });
+
+      renderRows(filtered);
+    }
+
+    async function loadDueDate() {
+      const tbody = document.getElementById("dd-tbody");
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="36" style="text-align:center; padding:28px; color:#94a3b8;">Memuat data dari Google Apps Script...</td></tr>`;
+      }
+
+      try {
+        const res = await postToGas({ action: "getData", module: "DUE_DATE" });
+        if (!res || res.status !== "success") {
+          throw new Error((res && res.message) || "Respons tidak valid dari Apps Script.");
+        }
+
+        allItems = Array.isArray(res.items) ? res.items : [];
+        populateTypeFilter(res.types || []);
+        renderSummary(res);
+        applyFilters();
+      } catch (err) {
+        console.error(err);
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="36" style="text-align:center; padding:24px; color:#f87171;">Gagal memuat data Due Date: ${err.message}</td></tr>`;
+        }
+      }
+    }
+
+    function toggleModal(show) {
+      const modal = document.getElementById("dd-modal");
+      if (!modal) return;
+      modal.classList.toggle("hidden", !show);
+      modal.classList.toggle("flex", show);
+    }
+
+    document.getElementById("dd-search")?.addEventListener("input", applyFilters);
+    document.getElementById("dd-filter-type")?.addEventListener("change", applyFilters);
+    document.getElementById("dd-filter-status")?.addEventListener("change", applyFilters);
+    document.getElementById("dd-btn-refresh")?.addEventListener("click", loadDueDate);
+
+    document.getElementById("dd-btn-open-modal")?.addEventListener("click", () => {
+      const msg = document.getElementById("dd-form-msg");
+      if (msg) msg.classList.add("hidden");
+      toggleModal(true);
+    });
+    document.getElementById("dd-btn-close-modal")?.addEventListener("click", () => toggleModal(false));
+    document.getElementById("dd-btn-cancel")?.addEventListener("click", () => toggleModal(false));
+
+    document.getElementById("dd-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      const submitBtn = document.getElementById("dd-btn-submit");
+      const msgEl = document.getElementById("dd-form-msg");
+
+      const formData = {
+        agenda: form.agenda.value.trim(),
+        type: form.type.value.trim() || "VALDAT DISTRIBUSI",
+        targetDay: form.targetDay.value.trim(),
+        pic: form.pic.value.trim() || "-",
+        ket: form.ket.value.trim()
+      };
+
+      if (!formData.agenda) return;
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Menyimpan...";
+      }
+      if (msgEl) {
+        msgEl.classList.add("hidden");
+      }
+
+      try {
+        const res = await postToGas({ action: "addAgenda", formData });
+        if (!res || res.status !== "success") {
+          throw new Error((res && res.message) || "Gagal menyimpan agenda.");
+        }
+        form.reset();
+        toggleModal(false);
+        await loadDueDate();
+      } catch (err) {
+        if (msgEl) {
+          msgEl.textContent = `Error: ${err.message}`;
+          msgEl.className = "text-xs text-red-400";
+          msgEl.classList.remove("hidden");
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Simpan Agenda";
+        }
+      }
+    });
+
+    await loadDueDate();
   };
 </script>
