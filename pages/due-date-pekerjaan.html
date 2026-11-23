@@ -1,0 +1,17 @@
+<div class="space-y-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+    <h1 class="text-lg font-bold">Due Date Pekerjaan</h1>
+    <p class="text-xs text-slate-400">File terpisah: <code>pages/due-date-pekerjaan.html</code></p>
+  </div>
+
+  <div id="due-date-pekerjaan-content" class="bg-slate-900 border border-slate-800 rounded-xl p-5 text-sm text-slate-300">
+    Menyiapkan data Due Date Pekerjaan...
+  </div>
+</div>
+
+<script>
+  window.initDueDatePekerjaan = async function () {
+    const box = document.getElementById("due-date-pekerjaan-content");
+    box.innerHTML = "Area khusus <strong>Due Date Pekerjaan</strong> — edit tampilan/logika di file <code>pages/due-date-pekerjaan.html</code>.";
+  };
+</script>
