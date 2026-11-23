@@ -6,7 +6,7 @@
   }
   .dd-table-wrap {
     overflow-x: auto;
-    max-height: 540px;
+    max-height: 560px;
   }
   .dd-table {
     width: 100%;
@@ -18,7 +18,7 @@
     border-bottom: 1px solid #334155;
     border-right: 1px solid rgba(51, 65, 85, 0.45);
     padding: 8px 10px;
-    white-space: nowrap;
+    vertical-align: top;
   }
   .dd-table th:last-child,
   .dd-table td:last-child {
@@ -34,11 +34,49 @@
     top: 0;
     z-index: 10;
     text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .dd-nowrap {
+    white-space: nowrap;
+    vertical-align: middle !important;
+  }
+  .dd-case-cell {
+    min-width: 280px;
+    max-width: 340px;
+    cursor: pointer;
+  }
+  .dd-case-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    line-height: 1.35;
+    color: #fff;
+    font-weight: 600;
+  }
+  .dd-case-cell.is-expanded .dd-case-text {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+  .dd-case-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.68rem;
+    color: #60a5fa;
   }
   .dd-day-cell {
     min-width: 34px;
     text-align: center;
     font-weight: 700;
+    white-space: nowrap;
+    vertical-align: middle !important;
+  }
+  .dd-des-header {
+    background: rgba(6, 182, 212, 0.14) !important;
+    color: #22d3ee !important;
   }
   .dd-today-col {
     outline: 2px solid #3b82f6;
@@ -170,24 +208,29 @@
       <table class="dd-table">
         <thead>
           <tr>
-            <th style="width: 45px;">No</th>
-            <th style="min-width: 260px; text-align: left;">Agenda / Pekerjaan</th>
-            <th style="min-width: 120px;">Type</th>
-            <th style="min-width: 110px;">PIC</th>
-            <th style="min-width: 95px;">Status</th>
-            <!-- Hari 1..30 -->
+            <th rowspan="2" style="width: 45px;">No</th>
+            <th rowspan="2" style="min-width: 280px; text-align: left;">Agenda / Case</th>
+            <th rowspan="2" style="min-width: 120px;">Type</th>
+            <th rowspan="2" style="min-width: 110px;">PIC</th>
+            <th rowspan="2" style="min-width: 95px;">Status</th>
+            <th colspan="30">Due Date 1 - 30</th>
+            <th colspan="8" class="dd-des-header">Desember 1 - 8</th>
+            <th rowspan="2" style="min-width: 180px; text-align: left;">Keterangan / Log / Hasil</th>
+          </tr>
+          <tr>
             <th class="dd-day-cell">1</th><th class="dd-day-cell">2</th><th class="dd-day-cell">3</th><th class="dd-day-cell">4</th><th class="dd-day-cell">5</th>
             <th class="dd-day-cell">6</th><th class="dd-day-cell">7</th><th class="dd-day-cell">8</th><th class="dd-day-cell">9</th><th class="dd-day-cell">10</th>
             <th class="dd-day-cell">11</th><th class="dd-day-cell">12</th><th class="dd-day-cell">13</th><th class="dd-day-cell">14</th><th class="dd-day-cell">15</th>
             <th class="dd-day-cell">16</th><th class="dd-day-cell">17</th><th class="dd-day-cell">18</th><th class="dd-day-cell">19</th><th class="dd-day-cell">20</th>
             <th class="dd-day-cell">21</th><th class="dd-day-cell">22</th><th class="dd-day-cell">23</th><th class="dd-day-cell">24</th><th class="dd-day-cell">25</th>
             <th class="dd-day-cell">26</th><th class="dd-day-cell">27</th><th class="dd-day-cell">28</th><th class="dd-day-cell">29</th><th class="dd-day-cell">30</th>
-            <th style="min-width: 160px; text-align: left;">Keterangan / Hasil</th>
+            <th class="dd-day-cell dd-des-header">1</th><th class="dd-day-cell dd-des-header">2</th><th class="dd-day-cell dd-des-header">3</th><th class="dd-day-cell dd-des-header">4</th>
+            <th class="dd-day-cell dd-des-header">5</th><th class="dd-day-cell dd-des-header">6</th><th class="dd-day-cell dd-des-header">7</th><th class="dd-day-cell dd-des-header">8</th>
           </tr>
         </thead>
         <tbody id="dd-tbody">
           <tr>
-            <td colspan="36" style="text-align: center; padding: 28px; color: #94a3b8;">Memuat data Due Date Pekerjaan...</td>
+            <td colspan="44" style="text-align: center; padding: 28px; color: #94a3b8;">Memuat data Due Date Pekerjaan...</td>
           </tr>
         </tbody>
       </table>
@@ -207,8 +250,8 @@
 
     <form id="dd-form" class="space-y-3 text-sm">
       <div>
-        <label class="block text-xs text-slate-400 mb-1">Nama Agenda / Pekerjaan *</label>
-        <input type="text" name="agenda" required placeholder="Contoh: Validasi data wilayah Malang"
+        <label class="block text-xs text-slate-400 mb-1">Nama Agenda / Case *</label>
+        <input type="text" name="agenda" required placeholder="Contoh: VALIDASI DISTRIBUSI KLJ 75 CORE"
           class="w-full bg-slate-950 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none focus:border-blue-500">
       </div>
 
@@ -219,8 +262,8 @@
             class="w-full bg-slate-950 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none focus:border-blue-500">
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Target Tanggal (1-30)</label>
-          <input type="number" name="targetDay" min="1" max="30" placeholder="Misal: 25"
+          <label class="block text-xs text-slate-400 mb-1">Target Tanggal (1-30 atau D1-D8)</label>
+          <input type="text" name="targetDay" placeholder="Misal: 25 atau D2"
             class="w-full bg-slate-950 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none focus:border-blue-500">
         </div>
       </div>
@@ -259,11 +302,12 @@
     if (!gasUrl || gasUrl.includes("GANTI_DENGAN_URL")) {
       const tbody = document.getElementById("dd-tbody");
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="36" style="text-align:center; padding:24px; color:#f87171;">URL Google Apps Script belum diatur di assets/js/config.js.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="44" style="text-align:center; padding:24px; color:#f87171;">URL Google Apps Script belum diatur di assets/js/config.js.</td></tr>`;
       }
       return;
     }
 
+    const TOTAL_DAY_COLS = 38;
     let allItems = [];
 
     async function postToGas(payload) {
@@ -274,6 +318,14 @@
         body: JSON.stringify(payload)
       });
       return res.json();
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
     function populateTypeFilter(types) {
@@ -311,8 +363,8 @@
       if (elSub) {
         const tInfo = data.todayInfo;
         elSub.textContent = tInfo && tInfo.formattedDate
-          ? `Monitoring jadwal harian & due date • Hari ini: ${tInfo.formattedDate} (Tanggal ${tInfo.day})`
-          : "Monitoring jadwal harian & due date pekerjaan";
+          ? `Monitoring jadwal harian (1-30 & Des 1-8) • Hari ini: ${tInfo.formattedDate}`
+          : "Monitoring jadwal harian (1-30 & Des 1-8)";
       }
     }
 
@@ -321,7 +373,7 @@
       if (!tbody) return;
 
       if (!items || items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="36" style="text-align:center; padding:24px; color:#94a3b8;">Tidak ada agenda yang sesuai dengan filter.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="44" style="text-align:center; padding:24px; color:#94a3b8;">Tidak ada agenda yang sesuai dengan filter.</td></tr>`;
         return;
       }
 
@@ -334,7 +386,7 @@
         }
 
         const daysArr = Array.isArray(item.days) ? item.days : [];
-        const dayCells = Array.from({ length: 30 }, (_, idx) => {
+        const dayCells = Array.from({ length: TOTAL_DAY_COLS }, (_, idx) => {
           const dObj = daysArr[idx] || { val: "", bg: "", isToday: false };
           const styles = [];
           if (dObj.bg) {
@@ -342,20 +394,24 @@
           }
           const todayClass = dObj.isToday ? " dd-today-col" : "";
           const styleAttr = styles.length ? ` style="${styles.join(" ")}"` : "";
-          return `<td class="dd-day-cell${todayClass}"${styleAttr}>${dObj.val || ""}</td>`;
+          return `<td class="dd-day-cell${todayClass}"${styleAttr}>${escapeHtml(dObj.val || "")}</td>`;
         }).join("");
 
-        const noteText = [item.ket, item.hasil].filter(Boolean).join(" • ") || "-";
+        const noteText = [item.ket, item.log, item.hasil].filter(Boolean).join(" • ") || "-";
+        const agendaSafe = escapeHtml(item.agenda || "-");
 
         return `
           <tr>
-            <td style="text-align:center;">${item.no || "-"}</td>
-            <td style="font-weight:600; color:#fff;">${item.agenda || "-"}</td>
-            <td style="text-align:center;"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-xs">${item.type || "-"}</span></td>
-            <td style="text-align:center;">${item.pic || "-"}</td>
-            <td style="text-align:center;">${statusBadge}</td>
+            <td class="dd-nowrap" style="text-align:center;">${escapeHtml(item.no || "-")}</td>
+            <td class="dd-case-cell" title="Klik untuk buka/tutup teks penuh">
+              <div class="dd-case-text">${agendaSafe}</div>
+              <span class="dd-case-hint">Klik untuk buka/tutup</span>
+            </td>
+            <td class="dd-nowrap" style="text-align:center;"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-xs">${escapeHtml(item.type || "-")}</span></td>
+            <td class="dd-nowrap" style="text-align:center;">${escapeHtml(item.pic || "-")}</td>
+            <td class="dd-nowrap" style="text-align:center;">${statusBadge}</td>
             ${dayCells}
-            <td style="color:#cbd5e1;">${noteText}</td>
+            <td style="color:#cbd5e1; min-width:180px;">${escapeHtml(noteText)}</td>
           </tr>
         `;
       }).join("");
@@ -367,7 +423,7 @@
       const statusVal = document.getElementById("dd-filter-status")?.value || "ALL";
 
       const filtered = allItems.filter((item) => {
-        const hay = `${item.agenda || ""} ${item.pic || ""} ${item.ket || ""} ${item.hasil || ""}`.toLowerCase();
+        const hay = `${item.agenda || ""} ${item.pic || ""} ${item.ket || ""} ${item.log || ""} ${item.hasil || ""}`.toLowerCase();
         const matchQ = !q || hay.includes(q);
         const matchType = typeVal === "ALL" || item.type === typeVal;
 
@@ -385,7 +441,7 @@
     async function loadDueDate() {
       const tbody = document.getElementById("dd-tbody");
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="36" style="text-align:center; padding:28px; color:#94a3b8;">Memuat data dari Google Apps Script...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="44" style="text-align:center; padding:28px; color:#94a3b8;">Memuat data dari Google Apps Script...</td></tr>`;
       }
 
       try {
@@ -401,7 +457,7 @@
       } catch (err) {
         console.error(err);
         if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="36" style="text-align:center; padding:24px; color:#f87171;">Gagal memuat data Due Date: ${err.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="44" style="text-align:center; padding:24px; color:#f87171;">Gagal memuat data Due Date: ${escapeHtml(err.message)}</td></tr>`;
         }
       }
     }
@@ -412,6 +468,18 @@
       modal.classList.toggle("hidden", !show);
       modal.classList.toggle("flex", show);
     }
+
+    document.getElementById("dd-tbody")?.addEventListener("click", (e) => {
+      const cell = e.target.closest(".dd-case-cell");
+      if (!cell) return;
+      cell.classList.toggle("is-expanded");
+      const hint = cell.querySelector(".dd-case-hint");
+      if (hint) {
+        hint.textContent = cell.classList.contains("is-expanded")
+          ? "Klik untuk ringkas (maks. 4 baris)"
+          : "Klik untuk buka/tutup";
+      }
+    });
 
     document.getElementById("dd-search")?.addEventListener("input", applyFilters);
     document.getElementById("dd-filter-type")?.addEventListener("change", applyFilters);
