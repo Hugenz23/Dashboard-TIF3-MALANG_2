@@ -195,16 +195,64 @@
     </div>
 
     <div class="flex gap-3 items-center flex-wrap">
-      <select id="dd-filter-type" class="bg-slate-900 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none text-sm cursor-pointer">
-        <option value="ALL">Semua Type</option>
-      </select>
+     <!-- Filter Bar (Checkbox) -->
+  <div class="dd-card p-4 space-y-3">
+    <div class="flex flex-wrap justify-between items-center gap-3">
+      <div class="relative flex-1 min-w-[240px]">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input type="text" id="dd-search" placeholder="Cari agenda, PIC, atau keterangan..."
+          class="w-full bg-slate-900 border border-slate-700 text-white py-2 pl-10 pr-3.5 rounded-lg outline-none text-sm focus:border-blue-500">
+      </div>
 
-      <select id="dd-filter-status" class="bg-slate-900 border border-slate-700 text-white px-3 py-2 rounded-lg outline-none text-sm cursor-pointer">
-        <option value="ALL">Semua Status</option>
-        <option value="DUE_TODAY">Due Hari Ini</option>
-        <option value="PENDING">Pending</option>
-        <option value="DONE">Done</option>
-      </select>
+      <button id="dd-btn-reset-filter" type="button"
+        class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold inline-flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-rotate-left"></i> Reset Filter
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1 border-t border-slate-800/80 text-xs">
+      <!-- Checkbox Status -->
+      <div>
+        <div class="text-slate-400 font-semibold uppercase tracking-wider mb-1.5">
+          <i class="fa-solid fa-circle-check mr-1 text-blue-400"></i> Filter Status (bisa pilih lebih dari 1)
+        </div>
+        <div id="dd-status-checks" class="flex flex-wrap gap-2">
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 cursor-pointer hover:border-red-400/60">
+            <input type="checkbox" value="DUE_TODAY" class="dd-cb-status accent-red-500 rounded">
+            <span>Due Hari Ini</span>
+          </label>
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 cursor-pointer hover:border-amber-400/60">
+            <input type="checkbox" value="PENDING" class="dd-cb-status accent-amber-500 rounded">
+            <span>Pending</span>
+          </label>
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 cursor-pointer hover:border-emerald-400/60">
+            <input type="checkbox" value="DONE" class="dd-cb-status accent-emerald-500 rounded">
+            <span>Done</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Checkbox Type -->
+      <div>
+        <div class="text-slate-400 font-semibold uppercase tracking-wider mb-1.5">
+          <i class="fa-solid fa-tags mr-1 text-cyan-400"></i> Filter Type (bisa pilih lebih dari 1)
+        </div>
+        <div id="dd-type-checks" class="flex flex-wrap gap-2">
+          <span class="text-slate-500">Memuat daftar type...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifikasi Jumlah Hasil Filter -->
+    <div id="dd-filter-notif"
+      class="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs text-blue-200">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-circle-info text-blue-400"></i>
+        <span id="dd-notif-text">Menampilkan 0 dari 0 agenda.</span>
+      </div>
+      <span id="dd-notif-active" class="text-[11px] text-blue-300/90 font-medium">Semua data ditampilkan</span>
+    </div>
+  </div>
     </div>
   </div>
 
@@ -423,25 +471,86 @@
       }).join("");
     }
 
+    function renderTypeCheckboxes(types) {
+      const container = document.getElementById("dd-type-checks");
+      if (!container) return;
+
+      const previouslyChecked = Array.from(container.querySelectorAll(".dd-cb-type:checked"))
+        .map((cb) => cb.value);
+
+      const list = Array.isArray(types) ? types : [];
+      if (list.length === 0) {
+        container.innerHTML = `<span class="text-slate-500">Tidak ada kategori type</span>`;
+        return;
+      }
+
+      container.innerHTML = list.map((t) => {
+        const checkedAttr = previouslyChecked.includes(t) ? "checked" : "";
+        return `
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 cursor-pointer hover:border-cyan-400/60">
+            <input type="checkbox" value="${escapeHtml(t)}" class="dd-cb-type accent-cyan-400 rounded" ${checkedAttr}>
+            <span>${escapeHtml(t)}</span>
+          </label>
+        `;
+      }).join("");
+    }
+
+    function updateFilterNotification(filteredCount, totalCount, selectedStatuses, selectedTypes, searchQuery) {
+      const notifBox = document.getElementById("dd-filter-notif");
+      const notifText = document.getElementById("dd-notif-text");
+      const notifActive = document.getElementById("dd-notif-active");
+      if (!notifBox || !notifText || !notifActive) return;
+
+      const activeParts = [];
+      if (searchQuery) activeParts.push(`Pencarian: "${searchQuery}"`);
+      if (selectedStatuses.length > 0) activeParts.push(`Status: ${selectedStatuses.join(", ")}`);
+      if (selectedTypes.length > 0) activeParts.push(`Type: ${selectedTypes.join(", ")}`);
+
+      notifText.innerHTML = `Menampilkan <strong>${filteredCount}</strong> dari <strong>${totalCount}</strong> agenda.`;
+
+      if (filteredCount === 0 && totalCount > 0) {
+        notifBox.className = "flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 rounded-lg bg-amber-500/15 border border-amber-500/40 text-xs text-amber-200";
+        notifActive.textContent = "Tidak ada data cocok • Klik Reset Filter";
+      } else {
+        notifBox.className = "flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs text-blue-200";
+        notifActive.textContent = activeParts.length > 0 ? `Filter aktif: ${activeParts.join(" | ")}` : "Semua data ditampilkan";
+      }
+    }
+
     function applyFilters() {
       const q = (document.getElementById("dd-search")?.value || "").toLowerCase().trim();
-      const typeVal = document.getElementById("dd-filter-type")?.value || "ALL";
-      const statusVal = document.getElementById("dd-filter-status")?.value || "ALL";
+      const selectedStatuses = Array.from(document.querySelectorAll(".dd-cb-status:checked")).map((cb) => cb.value);
+      const selectedTypes = Array.from(document.querySelectorAll(".dd-cb-type:checked")).map((cb) => cb.value);
 
       const filtered = allItems.filter((item) => {
         const hay = `${item.agenda || ""} ${item.pic || ""} ${item.ket || ""} ${item.log || ""} ${item.hasil || ""}`.toLowerCase();
         const matchQ = !q || hay.includes(q);
-        const matchType = typeVal === "ALL" || item.type === typeVal;
+        const matchType = selectedTypes.length === 0 || selectedTypes.includes(item.type);
 
         let matchStatus = true;
-        if (statusVal === "DONE") matchStatus = Boolean(item.isDone);
-        else if (statusVal === "PENDING") matchStatus = !item.isDone;
-        else if (statusVal === "DUE_TODAY") matchStatus = Boolean(item.isDueToday);
+        if (selectedStatuses.length > 0) {
+          matchStatus = selectedStatuses.some((st) => {
+            if (st === "DONE") return Boolean(item.isDone);
+            if (st === "PENDING") return !item.isDone;
+            if (st === "DUE_TODAY") return Boolean(item.isDueToday);
+            return false;
+          });
+        }
 
         return matchQ && matchType && matchStatus;
       });
 
+      updateFilterNotification(filtered.length, allItems.length, selectedStatuses, selectedTypes, q);
       renderRows(filtered);
+    }
+
+    function resetFilters() {
+      const searchInput = document.getElementById("dd-search");
+      if (searchInput) searchInput.value = "";
+      document.querySelectorAll(".dd-cb-status, .dd-cb-type").forEach((cb) => {
+        cb.checked = false;
+      });
+      applyFilters();
     }
 
     async function loadDueDate() {
@@ -457,7 +566,7 @@
         }
 
         allItems = Array.isArray(res.items) ? res.items : [];
-        populateTypeFilter(res.types || []);
+        renderTypeCheckboxes(res.types || []);
         renderSummary(res);
         applyFilters();
       } catch (err) {
@@ -489,9 +598,9 @@
     });
 
     document.getElementById("dd-search")?.addEventListener("input", applyFilters);
-    document.getElementById("dd-filter-type")?.addEventListener("change", applyFilters);
-    document.getElementById("dd-filter-status")?.addEventListener("change", applyFilters);
-    document.getElementById("dd-btn-refresh")?.addEventListener("click", loadDueDate);
+    document.getElementById("dd-status-checks")?.addEventListener("change", applyFilters);
+    document.getElementById("dd-type-checks")?.addEventListener("change", applyFilters);
+    document.getElementById("dd-btn-reset-filter")?.addEventListener("click", resetFilters);
 
     document.getElementById("dd-btn-open-modal")?.addEventListener("click", () => {
       const msg = document.getElementById("dd-form-msg");
